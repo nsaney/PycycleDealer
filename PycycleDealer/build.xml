@@ -20,6 +20,9 @@
   <property name="deploy"        value="Deploy_${ant.project.name}"/>
   <property name="exec_jar_name" value="${ant.project.name}.jar"/>
   
+  <!-- Content properties -->
+  <property name="content_root"  value="content/**"/>
+  
   <!-- Jython properties -->
   <property name="jython_root"   value="jython"/>
   <property name="jython_source" value="Lib/**"/>
@@ -140,6 +143,10 @@
     
     <jar destfile="${deploy}/${exec_jar_name}">
       <fileset dir="${build}" />
+      <fileset
+        dir="."
+        includes="${content_root}"
+      />
       <fileset 
         dir="${jython_root}" 
         includes="${jython_source}"

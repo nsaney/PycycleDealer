@@ -43,6 +43,7 @@ from org.eclipse.jetty.websocket.servlet import WebSocketCreator
 
 ### Java SE ###
 # see: https://docs.oracle.com/javase/8/docs/api/
+from java.lang import ClassLoader
 from java.lang import String
 from java.lang import System
 from java.lang import Thread
@@ -82,7 +83,8 @@ def main():
     resourceHandler = ResourceHandler()
     resourceHandler.setDirectoriesListed(True)
     resourceHandler.setWelcomeFiles(array(["index.html"], String))
-    resourceHandler.setResourceBase("./content")
+    resourceDirectory = ClassLoader.getSystemResource("content").toExternalForm() # serving from the "content" directory embedded in the JAR file
+    resourceHandler.setResourceBase(resourceDirectory)
     resourceContext.setHandler(resourceHandler)
     childHandlers.add(resourceContext)
     

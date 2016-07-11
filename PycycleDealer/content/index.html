@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test Page</title>
+</head>
+<body>
+    <h1>WebSocket Test Page</h1>
+    
+    <h2>Open</h2>
+    <p><span id="spanOpening"></span><span id="spanOpen"></span></p>
+    
+    <h2>Message (Send)</h2>
+    <p>
+        <input type="text" id="inputSendMessageText"/>
+        <button id="buttonSend">Send</button>
+    </p>
+    
+    <h2>Message (Received)</h2>
+    <p><pre id="preMessage"></pre></p>
+    
+    <h2>Error</h2>
+    <p><span id="spanError"></pre></p>
+    
+    <h2>Close</h2>
+    <p><span id="spanClose"></span></p>
+    
+    <script>
+    window.onload = function () {
+        // see: https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_client_applications
+        
+        var spanOpening = document.getElementById('spanOpening');
+        var spanOpen = document.getElementById('spanOpen');
+        var inputSendMessageText = document.getElementById('inputSendMessageText');
+        var buttonSend = document.getElementById('buttonSend');
+        var preMessage = document.getElementById('preMessage');
+        var spanError = document.getElementById('spanError');
+        var spanClose = document.getElementById('spanClose');
+        
+        spanOpening.textContent = 'Opening...';
+        
+        var loc = window.location;
+        var websocketProtocol = loc.protocol === 'https:' ? 'wss:' : 'ws:';
+        var websocketUri = websocketProtocol + loc.host + '/wstest';
+        var exampleSocket = new WebSocket(websocketUri, ['subprotocol1', 'subprotocol2']);
+        
+        exampleSocket.onopen = function (event) {
+            spanOpen.textContent = 'open!'
+        };
+        
+        exampleSocket.onmessage = function (event) {
+            preMessage.textContent += 'Message: [' + event.data + ']\n';
+        };
+        
+        exampleSocket.onerror = function (event) {
+            spanError.textContent += 'Problem with WebSocket: ' + event;
+            console.log(event);
+        };
+        
+        exampleSocket.onclose = function (event) {
+            spanClose.textContent += 'WebSocket closed with code ' + event.code + ' and reason "' + event.reason + '"';
+            console.log(event);
+        };
+        
+        inputSendMessageText.onkeydown = function (e) {
+          if (e.which == 13) {
+            buttonSend.onclick();
+          }
+        }
+        
+        buttonSend.onclick = function () {
+            var messageToSend = inputSendMessageText.value;
+            inputSendMessageText.value = '';
+            exampleSocket.send(messageToSend);
+        };
+        
+    };
+    </script>
+</body>
+</html>

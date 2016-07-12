@@ -83,7 +83,7 @@ def main():
     resourceHandler = ResourceHandler()
     resourceHandler.setDirectoriesListed(True)
     resourceHandler.setWelcomeFiles(array(["index.html"], String))
-    resourceDirectory = ClassLoader.getSystemResource("content/websocket_test").toExternalForm() # serving from the "content" directory embedded in the JAR file
+    resourceDirectory = getResourceDirectoryForModuleName(__name__)
     resourceHandler.setResourceBase(resourceDirectory)
     resourceContext.setHandler(resourceHandler)
     childHandlers.add(resourceContext)
@@ -96,6 +96,15 @@ def main():
     
     server.start()
     server.join()
+#
+
+def getResourceDirectoryForModuleName(moduleName):
+    # serving from the "content" directory embedded in the JAR file
+    prefix = "content/"
+    moduleNamePath = moduleName.replace(".", "/")
+    resourcePath = prefix + moduleNamePath
+    resourceDirectory = ClassLoader.getSystemResource(resourcePath).toExternalForm()
+    return resourceDirectory
 #
 
 

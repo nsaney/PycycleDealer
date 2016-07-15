@@ -7,8 +7,8 @@ from jarray import array
 
 
 ### Chairosoft ###
-from chairosoft.util_function import consumer
-from chairosoft.util_function import function
+from chairosoft.util.function import consumer
+from chairosoft.util.function import function
 from chairosoft.jycycle_dealer import WebSocketObject
 from chairosoft.jycycle_dealer import WebSocketObjectDelegate
 

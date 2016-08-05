@@ -466,10 +466,10 @@ class Room:
         
             # log event
             if success:
-                self.LOG.info("Successfully removed %s from the room with reason '%s'." % (user, reason))
+                self.LOG.info("Successfully removed %s from the room for reason '%s'." % (user, reason))
             #
             else:
-                self.LOG.info("Could not remove %s from the room with reason '%s'." % (user, reason))
+                self.LOG.info("Unable to find %s in room to remove for reason '%s'." % (user, reason))
             #
             
             # followup

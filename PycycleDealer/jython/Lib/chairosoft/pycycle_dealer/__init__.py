@@ -391,7 +391,7 @@ class Room:
             else:
                 if session.isOpen():
                     reason = "Too many users." if tooManyUsers else "Session is already waiting."
-                    session.close(_StatusCode.NORMAL, reason)
+                    session.close(_StatusCode.TRY_AGAIN_LATER, reason)
                 #
             #
             
@@ -439,27 +439,21 @@ class Room:
         return success
     #
     
-    def removeUserForSession(self, session, reason):
+    def removeSession(self, session, statusCode, reason):
+        with self.usersLock:
+            session.close(statusCode, reason)
+        #
+    #
+    
+    def finalizeRemoveSession(self, session, reason):
         success = False
         with self.usersLock:
             user = self.getUserForSession(session)
-            success = self.removeUser(user, reason)
-        #
-        return success
-    #
-    
-    def removeUser(self, user, reason):
-        success = False
-        with self.usersLock:
             waitingRemovalSuccess = removeIfPresent(self.waitingUsersSortedSet, user)
             activeRemovalSuccess = removeIfPresent(self.activeUsersSortedSet, user)
             success = waitingRemovalSuccess or activeRemovalSuccess
             
             if success:
-                if user.session.isOpen():
-                    user.session.close(_StatusCode.NORMAL, reason)
-                #
-                
                 removeIfPresent(self.usersBySession, user.session)
                 removeIfPresent(self.usersByTicketNumber, user.ticketNumber)
             #
@@ -561,11 +555,8 @@ class Room:
     
     def handle_room_clientExit(self, user, actionParameters):
         with self.usersLock:
-            if user.session.isOpen():
-                statusCode = _StatusCode.NORMAL
-                reason = "Client Exit: " + actionParameters["reason"]
-                user.session.close(statusCode, reason);
-            #
+            reason = "Client Exit: " + actionParameters["reason"]
+            self.removeSession(user.session, _StatusCode.SHUTDOWN, reason);
         #
     #
     
@@ -589,7 +580,7 @@ class Room:
             ticketNumber = actionParameters["ticketNumber"]
             userToRemove = self.getUserForTicketNumber(ticketNumber)
             reason = actionParameters["reason"]
-            self.removeUser(userToRemove, reason)
+            self.removeSession(userToRemove.session, _StatusCode.NORMAL, reason)
         #
     #
     
@@ -752,7 +743,7 @@ class RoomWebSocketDelegate(_WebSocketObjectDelegate):
     #
     
     def handleWebSocketClose(self, session, statusCode, reason):
-        self.room.removeUserForSession(session, reason)
+        self.room.finalizeRemoveSession(session, reason)
     #
 #
 

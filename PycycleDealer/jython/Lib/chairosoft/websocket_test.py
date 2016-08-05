@@ -11,6 +11,7 @@ from chairosoft.util.function import consumer
 from chairosoft.util.function import function
 from chairosoft.jycycle_dealer import WebSocketObject
 from chairosoft.jycycle_dealer import WebSocketObjectDelegate
+import chairosoft.pycycle_dealer as pycycle_dealer
 
 
 ### Jetty ###
@@ -83,7 +84,7 @@ def main():
     resourceHandler = ResourceHandler()
     resourceHandler.setDirectoriesListed(True)
     resourceHandler.setWelcomeFiles(array(["index.html"], String))
-    resourceDirectory = getResourceDirectoryForModuleName(__name__)
+    resourceDirectory = pycycle_dealer.getResourceDirectoryForModuleName(__name__)
     resourceHandler.setResourceBase(resourceDirectory)
     resourceContext.setHandler(resourceHandler)
     childHandlers.add(resourceContext)
@@ -96,15 +97,6 @@ def main():
     
     server.start()
     server.join()
-#
-
-def getResourceDirectoryForModuleName(moduleName):
-    # serving from the "content" directory embedded in the JAR file
-    prefix = "content/"
-    moduleNamePath = moduleName.replace(".", "/")
-    resourcePath = prefix + moduleNamePath
-    resourceDirectory = ClassLoader.getSystemResource(resourcePath).toExternalForm()
-    return resourceDirectory
 #
 
 

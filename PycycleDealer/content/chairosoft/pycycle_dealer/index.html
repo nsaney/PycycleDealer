@@ -158,7 +158,7 @@
     <script>
     var websocket = null;
     window.onbeforeunload = function (e) {
-        if (websocket) {
+        if (websocket && websocket.readyState === WebSocket.OPEN) {
             var jsonText = JSON.stringify({
                 target: 'room',
                 method: 'clientExit',

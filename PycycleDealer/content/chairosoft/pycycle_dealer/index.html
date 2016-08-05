@@ -109,15 +109,21 @@
         function enableInput(element) { element.disabled = ''; }
         function disableInput(element) { element.disabled = 'disabled'; }
         
+        function padLeft(str, ch, len) {
+            str = '' + str;
+            while (str.length < len) { str = ch + str; }
+            return str;
+        }
+        
         function formatDateForChat(date) {
             var year = date.getFullYear();
             var month = date.getMonth() + 1;
             var day = date.getDate();
-            var datePart = year + '-' + month + '-' + day;
+            var datePart = [year, month, day].map(str => padLeft(str, '0', 2)).join('-');
             var hour = date.getHours();
             var minute = date.getMinutes();
             var second = date.getSeconds();
-            var timePart = hour + ':' + minute + ':' + second;
+            var timePart = [hour, minute, second].map(str => padLeft(str, '0', 2)).join(':');
             return datePart + ' ' + timePart;
         }
         

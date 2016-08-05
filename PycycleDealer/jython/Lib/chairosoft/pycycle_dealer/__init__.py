@@ -473,8 +473,10 @@ class Room:
             #
             
             # followup
-            if success and user is self.host:
-                self.host = None
+            if success:
+                if user is self.host:
+                    self.host = None
+                #
                 self.ensureHostExistsAndUpdateRoom()
             #
         #

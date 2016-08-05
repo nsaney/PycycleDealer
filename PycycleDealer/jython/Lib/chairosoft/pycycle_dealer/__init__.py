@@ -32,6 +32,7 @@ from org.eclipse.jetty.server.handler import ResourceHandler as _ResourceHandler
 from org.eclipse.jetty.util.log import Log as _Log
 from org.eclipse.jetty.websocket.api import StatusCode as _StatusCode
 from org.eclipse.jetty.websocket.api import WebSocketListener as _WebSocketListener
+from org.eclipse.jetty.websocket.common import ConnectionState as _ConnectionState
 from org.eclipse.jetty.websocket.server import WebSocketHandler as _WebSocketHandler
 from org.eclipse.jetty.websocket.servlet import WebSocketCreator as _WebSocketCreator
 
@@ -111,6 +112,14 @@ def removeIfPresent(collection, key):
     return result
 #
 
+def getConnectionState(session):
+    return session.getConnection().getIOState().getConnectionState();
+#
+
+def hasRemoteEndpoint(session):
+    state = getConnectionState(session)
+    return state == _ConnectionState.OPEN or state == _ConnectionState.CONNECTED;
+#
 
 
 #######################
@@ -600,15 +609,15 @@ class Room:
     ## Instance Methods - Sending to Clients
     def sendInterfaceUpdateToUser(self, userInterfaceUpdate, user):
         try:
-            if user.session.isOpen():
+            if hasRemoteEndpoint(user.session):
                 remote = user.session.getRemote()
                 remote.sendString(userInterfaceUpdate.jsonText)
             #
         #
         except _Throwable as ex:
             message = "Problem while sending update to %s. " % (user)
-            message += "Session isOpen=%s. " % (user.session.isOpen())
-            message += "Cxn state=%s. " % (user.session.getConnection().getIOState().getConnectionState())
+            message += "Session hasRemoteEndpoint=%s. " % (hasRemoteEndpoint(user.session))
+            message += "Cxn state=%s. " % (getConnectionState(user.session))
             message += "Error: %r" % (ex)
             self.LOG.warn(message)
         #

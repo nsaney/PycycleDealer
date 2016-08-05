@@ -158,7 +158,6 @@
     <script>
     var websocket = null;
     window.onbeforeunload = function (e) {
-        var message = null;
         if (websocket) {
             var jsonText = JSON.stringify({
                 target: 'room',
@@ -168,15 +167,7 @@
                 }
             });
             websocket.send(jsonText);
-            websocket.close();
-            message = 'Closed websocket!';
         }
-        else {
-            // nothing here
-            message = 'No websocket.';
-        }
-        e.returnValue = message;
-        return message;
     };
     window.onload = function () {
         // Page Elements

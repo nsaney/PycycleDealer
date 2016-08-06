@@ -38,6 +38,7 @@ from org.eclipse.jetty.websocket.servlet import WebSocketCreator as _WebSocketCr
 
 ### Java SE ###
 # see: https://docs.oracle.com/javase/8/docs/api/
+from java.io import File as _File
 from java.lang import ClassCastException as _ClassCastException
 from java.lang import ClassLoader as _ClassLoader
 from java.lang import Comparable as _Comparable
@@ -62,6 +63,7 @@ from java.util.concurrent.atomic import AtomicInteger as _AtomicInteger
 ##########################
 
 PARAMETER_PYCYCLE_USER_NAME = "pycycleUserName"
+PYCYCLE_DEBUG_RESOURCE_ROOT = _System.getProperty("pycycle.debug.resource.root")
 
 
 ##########################
@@ -71,11 +73,18 @@ PARAMETER_PYCYCLE_USER_NAME = "pycycleUserName"
 def getResourceDirectoryForModuleName(moduleName):
     resourceDirectory = None
     try:
-        # serving from the "content" directory embedded in the JAR file
         prefix = "content/"
         moduleNamePath = moduleName.replace(".", "/")
         resourcePath = prefix + moduleNamePath
-        resourceDirectory = _ClassLoader.getSystemResource(resourcePath).toExternalForm()
+        
+        if PYCYCLE_DEBUG_RESOURCE_ROOT is None:
+            # serving from the "content" directory embedded in the JAR file
+            resourceDirectory = _ClassLoader.getSystemResource(resourcePath).toExternalForm()
+        #
+        else:
+            # serving from the "content" directory from the debug root
+            resourceDirectory = _File(PYCYCLE_DEBUG_RESOURCE_ROOT, resourcePath).toString()
+        #
     #
     except Exception as ex:
         message = "Could not get resource directory for module '" + str(moduleName) + "'. "
@@ -811,6 +820,9 @@ class RoomServer:
         resourceHandler = _ResourceHandler()
         resourceHandler.setDirectoriesListed(True)
         resourceHandler.setWelcomeFiles(_jarray.array(["index.html"], _String))
+        if PYCYCLE_DEBUG_RESOURCE_ROOT is not None:
+            resourceHandler.setMinMemoryMappedContentLength(-1);
+        #
         resourceDirectory = getResourceDirectoryForModuleName(__name__)
         resourceHandler.setResourceBase(resourceDirectory)
         resourceContext.setHandler(resourceHandler)

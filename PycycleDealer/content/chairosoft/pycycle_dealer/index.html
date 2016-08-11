@@ -1,461 +1,173 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Pycycle Dealer Room</title>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <style>
-        body > div
-        {
-            display: none
-        }
-    </style>
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Pycycle Dealer Room</title>
+    
+    <!-- ============================ Styles ============================ -->
+    <!-- === Bootstrap === -->
+    <link href="web_resources/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet"/>
 </head>
-<body>
-    <h1>Pycycle Dealer Room</h1>
+<body style="display: none" data-bind="visible: windowLoaded">
     
-    <div id="divPreOpen">
-        <h2>Welcome!</h2>
-        <table>
-            <tr>
-                <td><label for="inputUsername">Username</label></td>
-                <td><input type="text" id="inputUsername"/></td>
-            </tr>
-            <tr>
-                <td><label for="inputPassword">Password</label></td>
-                <td><input type="password" id="inputPassword"/></td>
-            </tr>
-            <tr>
-                <td colspan="2"><button id="buttonRequestEntry">Enter Game Room</button></td>
-            </tr>
-        </table>
+    <!-- ============================ Content ============================ -->
+    <div class="container" data-bind="ifnot: websocketReadyState">
+        <h3>Pycycle Dealer Room</h3>
+        
+        <h4>Welcome!</h4>
+        <form data-bind="submit: formEnterRoom_onsubmit">
+            <table>
+                <tr>
+                    <td><label for="inputUsername">Username</label></td>
+                    <td><input id="inputUsername" type="text" data-bind="value: userName"/></td>
+                </tr>
+                <tr>
+                    <td><label for="inputPassword">Password</label></td>
+                    <td><input id="inputPassword" type="password"/></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="submit" value="Enter Game Room"/></td>
+                </tr>
+            </table>
+        </form>
     </div>
     
-    <div id="divOpenWaiting">
-        <br/>
-        Waiting to enter room...
+    <div class="container" data-bind="if: websocketReadyState() === WebSocket.CONNECTING">
+        Connecting to server...
     </div>
     
-    <div id="divOpenActive">
-        <h2>Message (Send)</h2>
-        <input type="text" id="inputSendMessageText"/>
-        <button id="buttonSend">Send</button>
-      
-        <h2>Message (Received)</h2>
-        <pre id="preMessage"></pre>
+    <div class="container" data-bind="if: websocketReadyState() === WebSocket.OPEN">
+        <!-- Tab nav -->
+        <ul class="nav nav-tabs">
+            <li class="nav active">
+                <a href="#profile" data-toggle="tab">Profile</a>
+            </li>
+            <li class="nav" data-bind="if: ticketNumber">
+                <a href="#chat" data-toggle="tab">Chat</a>
+            </li>
+            <li class="nav" data-bind="if: game">
+                <a href="#game" data-toggle="tab">Game</a>
+            </li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <!-- Profile pane -->
+            <div class="tab-pane fade in active" id="profile">
+                <div data-bind="ifnot: ticketNumber">
+                    Waiting to enter room...
+                </div>
+                <div data-bind="if: ticketNumber">
+                    <!-- Profile Information -->
+                    <h4>My Info</h4>
+                    <table class="table">
+                        <tr>
+                            <td>Ticket Number</td>
+                            <td>Name</td>
+                        </tr>
+                        <tr>
+                            <td data-bind="text: ticketNumber"></td>
+                            <td data-bind="text: userName"></td>
+                        </tr>
+                    </table>
+                    <!-- Host Information -->
+                    <div data-bind="if: isHost">
+                        <h4>Active Users</h4>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <td>Ticket Number</td>
+                                    <td>User Name</td>
+                                    <td>Remove from Room</td>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="foreach: activeUsersList">
+                                <tr>
+                                    <td data-bind="text: ticketNumber"></td>
+                                    <td data-bind="text: name"></td>
+                                    <td><button data-bind="click: $parent.removeUser">Remove</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <h4>Waiting Users</h4>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <td>Ticket Number</td>
+                                    <td>User Name</td>
+                                    <td>Move to Active</td>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="foreach: waitingUsersList">
+                                <tr>
+                                    <td data-bind="text: ticketNumber"></td>
+                                    <td data-bind="text: name"></td>
+                                    <td><button data-bind="click: $parent.activateUser">Activate</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- Chat pane -->
+            <div class="tab-pane fade" id="chat" data-bind="if: ticketNumber">
+                <h4>Message (Send)</h4>
+                <form data-bind="submit: formChat_onsubmit">
+                    <input type="text" data-bind="value: chatWorkingMessage"/>
+                    <input type="submit" value="Send"/>
+                </form>
+              
+                <h4>Message (Received)</h4>
+                <table class="table">
+                    <tbody data-bind="foreach: chatEntries">
+                        <tr>
+                            <td data-bind="chatDateFromTimeMs: serverEpochTimestampMs"></td>
+                            <td data-bind="text: userName"></td>
+                            <td data-bind="text: message"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Game pane -->
+            <div class="tab-pane fade" id="game" data-bind="if: game">
+                TODO: Content inside tab Game
+            </div>
+        </div>
     </div>
     
-    <div id="divHost">
-        <h2>Active Users</h2>
-        <table id="tableActiveUsers">
-            <thead id="theadActiveUsers"></thead>
-            <tbody id="tbodyActiveUsers"></tbody>
-        </table>
-        
-        <h2>Waiting Users</h2>
-        <table id="tableWaitingUsers">
-            <thead id="theadWaitingUsers"></thead>
-            <tbody id="tbodyWaitingUsers"></tbody>
-        </table>
+    <div class="container" data-bind="if: websocketReadyState() === WebSocket.CLOSING">
+        Disconnecting from server...
     </div>
     
-    <div id="divError">
-        <h2>Error</h2>
-        <span id="spanError"></pre>
+    <div class="container" data-bind="if: websocketReadyState() === WebSocket.CLOSED">
+        <div data-bind="if: websocketErrorText">
+            <h4>Error</h4>
+            <span data-bind="text: websocketErrorText"></span>
+        </div>
+        <div data-bind="if: websocketCloseText">
+            <h4>Closed</h4>
+            <span data-bind="text: websocketCloseText"></span>
+        </div>
     </div>
     
-    <div id="divClose">
-        <h2>Closed</h2>
-        <span id="spanClose"></span>
-    </div>
+    <!-- ============================ Scripts ============================ -->
+    <!-- === Knockout === -->
+    <script src="web_resources/knockout-3.4.0.js"></script>
     
-    <!-- General Functions -->
-    <script>
-        // just in case
-        if (!window.console) {
-            window.console = {
-                log: function () {}
-            };
-        }
-        
-        // last resort error catcher
-        var lastError = null;
-        window.onerror = function (message, source, line, col, error) {
-            console.log("Error in " + source + " at line #" + line + ", col=" + col + ": " + message)
-            lastError = error;
-        };
-        
-        // see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent
-        function fixedEncodeURIComponent(str) {
-          return encodeURIComponent(str).replace(/[!'()*]/g, function(c) {
-            return '%' + c.charCodeAt(0).toString(16);
-          });
-        }
-        
-        function clickButtonOnEnterKeyDown(button, inputs) {
-            if (inputs.length === undefined) { inputs = [inputs]; }
-            
-            inputs.forEach((input) => {
-                input.onkeydown = function (e) {
-                    if (e.which == 13) {
-                        button.onclick();
-                    }
-                }
-            });
-        }
-        
-        function fromId(id) { return document.getElementById(id); }
-        
-        function showDiv(element) { element.style.display = 'block'; }
-        function hideDiv(element) { element.style.display = 'none'; }
-        function enableInput(element) { element.disabled = ''; }
-        function disableInput(element) { element.disabled = 'disabled'; }
-        
-        function padLeft(str, ch, len) {
-            str = '' + str;
-            while (str.length < len) { str = ch + str; }
-            return str;
-        }
-        
-        function formatDateForChat(date) {
-            var year = date.getFullYear();
-            var month = date.getMonth() + 1;
-            var day = date.getDate();
-            var datePart = [year, month, day].map(str => padLeft(str, '0', 2)).join('-');
-            var hour = date.getHours();
-            var minute = date.getMinutes();
-            var second = date.getSeconds();
-            var timePart = [hour, minute, second].map(str => padLeft(str, '0', 2)).join(':');
-            return datePart + ' ' + timePart;
-        }
-        
-        function scrollBottom(element) {
-            // TODO
-        }
-        
-        function removeAllChildElements(element) {
-            // http://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript
-            while (element.firstChild) {
-                element.removeChild(element.firstChild);
-            }
-        }
-        
-        function addRowWithValues(tbody, values) {
-            var tr = document.createElement("TR");
-            values.forEach((value) => {
-                var td = document.createElement("TD");
-                if (typeof value === 'string' || typeof value === 'number') {
-                    td.textContent = value;
-                }
-                else {
-                    try {
-                        td.appendChild(value);
-                    }
-                    catch (e) {
-                        td.textContent = '?';
-                        console.log(e);
-                    }
-                }
-                tr.appendChild(td);
-            });
-            tbody.appendChild(tr);
-        }
-    </script>
+    <!-- === jQuery === -->
+    <!-- (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- === Bootstrap === -->
+    <!-- Include all compiled Bootstrap plugins below, or include individual files as needed -->
+    <script src="web_resources/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
     
-    <!-- Page-Specific Functions -->
-    <script>
-    var websocket = null;
-    window.onbeforeunload = function (e) {
-        if (websocket && websocket.readyState === WebSocket.OPEN) {
-            var jsonText = JSON.stringify({
-                target: 'room',
-                method: 'clientExit',
-                parameters: {
-                    reason: 'window.onbeforeunload'
-                }
-            });
-            websocket.send(jsonText);
-        }
-    };
-    window.onload = function () {
-        // Page Elements
-        var divPreOpen = fromId('divPreOpen');
-        var inputUsername = fromId('inputUsername');
-        var inputPassword = fromId('inputPassword');
-        var buttonRequestEntry = fromId('buttonRequestEntry');
-        
-        var divOpenWaiting = fromId('divOpenWaiting');
-        
-        var divOpenActive = fromId('divOpenActive');
-        var inputSendMessageText = fromId('inputSendMessageText');
-        var buttonSend = fromId('buttonSend');
-        var preMessage = fromId('preMessage');
-        
-        var divHost = fromId('divHost');
-        var tableWaitingUsers = fromId('tableWaitingUsers');
-        var theadWaitingUsers = fromId('theadWaitingUsers');
-        var tbodyWaitingUsers = fromId('tbodyWaitingUsers');
-        var tableActiveUsers = fromId('tableActiveUsers');
-        var theadActiveUsers = fromId('theadActiveUsers');
-        var tbodyActiveUsers = fromId('tbodyActiveUsers');
-        
-        var divError = fromId('divError');
-        var spanError = fromId('spanError');
-        
-        var divClose = fromId('divClose');
-        var spanClose = fromId('spanClose');
-        
-        
-        // Initial Setup
-        showDiv(divPreOpen);
-        
-        
-        // Pre-Open Events
-        buttonRequestEntry.onclick = function () {
-            connectToWebSocket();
-        };
-        clickButtonOnEnterKeyDown(buttonRequestEntry, [inputUsername, inputPassword]);
-        
-        
-        // Open Events
-        buttonSend.onclick = function () {
-            var chatMessage = inputSendMessageText.value;
-            inputSendMessageText.value = '';
-            sendChatMessage(chatMessage);
-        };
-        clickButtonOnEnterKeyDown(buttonSend, inputSendMessageText);
-        
-        
-        // Web Socket Handler
-        // see: https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_client_applications
-        function connectToWebSocket() {
-            [inputUsername, inputPassword, buttonRequestEntry].forEach((x) => disableInput(x));
-            
-            var loc = window.location;
-            var websocketProtocol = loc.protocol === 'https:' ? 'wss:' : 'ws:';
-            var websocketUri = websocketProtocol + loc.host + '/websocket';
-            websocketUri += '?pycycleUserName=' + fixedEncodeURIComponent(inputUsername.value);
-            var websocketSubProtocols = [];
-            websocket = new WebSocket(websocketUri, websocketSubProtocols);
-            websocket.onopen = onWebSocketOpen;
-            websocket.onmessage = onWebSocketMessage;
-            websocket.onerror = onWebSocketError;
-            websocket.onclose = onWebSocketClose;
-        }
-        
-        function onWebSocketOpen(event) {
-            showDiv(divOpenWaiting);
-        };
-        
-        function onWebSocketMessage(event) {
-            var update = JSON.parse(event.data);
-            handleUpdate(update);
-        };
-        
-        function onWebSocketError(event) {
-            var nonErrorDivs = document.querySelectorAll('body > div:not(#divError)');
-            nonErrorDivs.forEach((div) => { hideDiv(div); });
-            showDiv(divError);
-            spanError.textContent += 'Problem with WebSocket: ' + event;
-            console.log(event);
-        };
-        
-        function onWebSocketClose(event) {
-            var nonErrorDivs = document.querySelectorAll('body > div:not(#divError)');
-            nonErrorDivs.forEach((div) => { hideDiv(div); });
-            showDiv(divClose);
-            spanClose.textContent += 'WebSocket closed with code ' + event.code + ' and reason "' + event.reason + '"';
-            console.log(event);
-        };
-        
-        
-        // Receiving from Server
-        function handleUpdate(update) {
-            var updateFunction = null;
-            var targetDictionary = updateDictionary[update.target];
-            if (targetDictionary) {
-                updateFunction = targetDictionary[update.method];
-            }
-            
-            if (typeof updateFunction === 'function') {
-                try {
-                    updateFunction(update.parameters);
-                }
-                catch (err) {
-                    var message = 'Error occurred while handling update: ' + err;
-                    console.log(message);
-                }
-            }
-            else {
-                console.log('Unable to handle update: ' + event.data);
-            }
-        }
-        
-        var acknowledgeDictionary = {
-            // this becomes fully populated later, in "Sending to Server" section
-            room: {},
-            game: {}
-        }; 
-        function room_acknowledge(updateParameters) {
-            var originalJsonText = updateParameters.originalJsonText;
-            var parseSuccess = updateParameters.parseSuccess;
-            if (parseSuccess) {
-                var originalAction = JSON.parse(originalJsonText);
-                var success = updateParameters.success;
-                if (success) {
-                    var acknowledgeFunction = null;
-                    var targetDictionary = acknowledgeDictionary[originalAction.target];
-                    if (targetDictionary) {
-                        acknowledgeFunction = targetDictionary[originalAction.method];
-                    }
-                    
-                    if (typeof acknowledgeFunction === 'function') {
-                        try {
-                            acknowledgeFunction(originalAction);
-                        }
-                        catch (err) {
-                            var message = 'Error occurred while handling acknowledgment: ' + err;
-                            console.log(message);
-                        }
-                    }
-                    else {
-                        // no acknowledge function
-                    }
-                }
-                else {
-                    var errorMessage = updateParameters.errorMessage;
-                    console.log("Server error while handling action: " + errorMessage + "\nFrom " + originalJsonText)
-                }
-            }
-            else {
-                console.log("Server could not parse action: " + originalJsonText);
-            }
-        };
-        
-        function room_activate(updateParameters) {
-            hideDiv(divOpenWaiting);
-            showDiv(divOpenActive);
-        };
-        
-        function room_hostActivate(updateParameters) {
-            addRowWithValues(theadActiveUsers, [
-                'Ticket Number',
-                'User Name',
-                'Remove from Room'
-            ]);
-            addRowWithValues(theadWaitingUsers, [
-                'Ticket Number',
-                'User Name',
-                'Move to Active'
-            ]);
-            showDiv(divHost);
-        };
-        
-        function room_hostDeactivate(updateParameters) {
-            removeAllChildElements(theadWaitingUsers);
-            removeAllChildElements(tbodyWaitingUsers);
-            removeAllChildElements(theadActiveUsers);
-            removeAllChildElements(tbodyActiveUsers);
-            hideDiv(divHost);
-        };
-        
-        function room_hostUserSets(updateParameters) {
-            // this naively drops both lists and recreates them
-            removeAllChildElements(tbodyWaitingUsers);
-            updateParameters.waitingUsersList.forEach((user) => {
-                var activateButton = document.createElement('BUTTON');
-                activateButton.textContent = 'Activate'
-                activateButton.onclick = function (e) {
-                    sendActivateTicketNumber(user.ticketNumber);
-                };
-                addRowWithValues(tbodyWaitingUsers, [
-                    user.ticketNumber,
-                    user.name,
-                    activateButton
-                ]);
-            });
-            removeAllChildElements(tbodyActiveUsers);
-            updateParameters.activeUsersList.forEach((user) => {
-                var removeButton = document.createElement('BUTTON');
-                removeButton.textContent = 'Remove'
-                removeButton.onclick = function (e) {
-                    sendRemoveTicketNumber(user.ticketNumber, 'Removed by Host');
-                };
-                addRowWithValues(tbodyActiveUsers, [
-                    user.ticketNumber,
-                    user.name,
-                    removeButton
-                ]);
-            });
-        };
-        
-        function room_chat(updateParameters) {
-            var serverTimestamp = new Date(updateParameters.serverEpochTimestampMs);
-            var chatEntry = '';
-            chatEntry += '[' + formatDateForChat(serverTimestamp) + ']';
-            chatEntry += '[' + updateParameters.userName + ']';
-            chatEntry += ' ' + updateParameters.message;
-            preMessage.textContent += '\n' + chatEntry;
-        };
-        
-        var updateDictionary = {
-            'room': {
-                'acknowledge': room_acknowledge,
-                'activate': room_activate,
-                'hostActivate': room_hostActivate,
-                'hostDeactivate': room_hostDeactivate,
-                'hostUserSets': room_hostUserSets,
-                'chat': room_chat
-            },
-            '_game': {
-            }
-        };
-        
-        
-        // Sending to Server (and handling acknowledgment receipts)
-        function sendChatMessage(chatMessage) {
-            var jsonText = JSON.stringify({
-                target: 'room',
-                method: 'chat',
-                parameters: {
-                    message: chatMessage
-                }
-            });
-            websocket.send(jsonText);
-        };
-        
-        function sendActivateTicketNumber(ticketNumber) {
-            var jsonText = JSON.stringify({
-                target: 'room',
-                method: 'activateTicketNumber',
-                parameters: {
-                    ticketNumber: ticketNumber,
-                }
-            });
-            websocket.send(jsonText)
-        };
-        acknowledgeDictionary.room.activateTicketNumber = function (originalAction) {
-            var ticketNumber = originalAction.parameters.ticketNumber;
-            var message = 'Successfully activated ticket number #' + ticketNumber;
-            console.log(message);
-        };
-        
-        function sendRemoveTicketNumber(ticketNumber, reason) {
-            var jsonText = JSON.stringify({
-                target: 'room',
-                method: 'removeTicketNumber',
-                parameters: {
-                    ticketNumber: ticketNumber,
-                    reason: reason
-                }
-            });
-            websocket.send(jsonText);
-        };
-        acknowledgeDictionary.room.removeTicketNumber = function (originalAction) {
-            var ticketNumber = originalAction.parameters.ticketNumber;
-            var message = 'Successfully removed ticket number #' + ticketNumber;
-            console.log(message);
-        };
-    };
-    </script>
+    <!-- === Pycycle Dealer === -->
+    <!-- Utility functions and general setup -->
+    <script src="utils.js"></script>
+    <!-- Knockout ViewModel for this page -->
+    <script src="index.js"></script>
 </body>
 </html>

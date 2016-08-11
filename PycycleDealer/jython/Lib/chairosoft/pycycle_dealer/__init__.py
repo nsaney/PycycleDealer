@@ -662,7 +662,9 @@ class Room:
             userInterfaceUpdate = UserInterfaceUpdate(
                 target = "room", 
                 method = "activate", 
-                parameters = {}
+                parameters = {
+                    "user": activatedUser.asDictionary()
+                }
             )
             self.sendInterfaceUpdateToUser(userInterfaceUpdate, activatedUser)
         #

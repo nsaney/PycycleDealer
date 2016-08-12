@@ -685,7 +685,7 @@ class Room:
         with self.usersLock:
             oldHost = self.host
             self.host = nextHost
-            self.LOG.info("Changed the host of the room from %s to %s." % (oldHost, self.host))
+            self.LOG.info("Changed the host of the room from " + str(oldHost) + " to " + str(self.host) + ".")
             
             hostDeactivate = UserInterfaceUpdate(
                 target = "room", 

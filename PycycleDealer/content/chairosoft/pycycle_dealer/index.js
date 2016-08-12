@@ -164,7 +164,6 @@ ko.applyBindings(new (function IndexViewModel() {
     };
     
     function room_chat(updateParameters) {
-        var serverTimestamp = new Date(updateParameters.serverEpochTimestampMs);
         self.chatEntries.push(updateParameters);
     };
     

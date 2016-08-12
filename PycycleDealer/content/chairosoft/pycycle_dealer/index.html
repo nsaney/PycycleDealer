@@ -116,6 +116,7 @@
                                 <tr>
                                     <th>Ticket #</th>
                                     <th>Name</th>
+                                    <th>Make Host</th>
                                     <th>Remove</th>
                                 </tr>
                             </thead>
@@ -123,6 +124,7 @@
                                 <tr>
                                     <td data-bind="text: ticketNumber"></td>
                                     <td data-bind="text: name"></td>
+                                    <td><button data-bind="click: $parent.makeHostUser">Make Host</button></td>
                                     <td><button data-bind="click: $parent.removeUser">Remove</button></td>
                                 </tr>
                             </tbody>

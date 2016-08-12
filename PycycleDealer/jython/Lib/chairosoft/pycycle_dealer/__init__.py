@@ -583,6 +583,16 @@ class Room:
         #
     #
     
+    def handle_room_makeHostTicketNumber(self, user, actionParameters):
+        with self.usersLock:
+            self.ensureUserIsHost(user)
+            ticketNumber = actionParameters["ticketNumber"]
+            userToMakeHost = self.getUserForTicketNumber(ticketNumber)
+            self.sendHostChange(userToMakeHost)
+            self.ensureHostExistsAndUpdateRoom()
+        #
+    #
+    
     def handle_room_removeTicketNumber(self, user, actionParameters):
         with self.usersLock:
             self.ensureUserIsHost(user)
@@ -599,6 +609,7 @@ class Room:
                 "clientExit": self.handle_room_clientExit,
                 "chat": self.handle_room_chat,
                 "activateTicketNumber": self.handle_room_activateTicketNumber,
+                "makeHostTicketNumber": self.handle_room_makeHostTicketNumber,
                 "removeTicketNumber": self.handle_room_removeTicketNumber,
                 "_startGame": None
             },

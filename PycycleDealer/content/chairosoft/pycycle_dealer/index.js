@@ -216,6 +216,24 @@ ko.applyBindings(new (function IndexViewModel() {
         console.log(message);
     };
     
+    self.makeHostUser = function (user) {
+        sendMakeHostTicketNumber(user.ticketNumber);
+    };
+    function sendMakeHostTicketNumber(ticketNumber) {
+        utils.sendJson(websocket, {
+            target: 'room',
+            method: 'makeHostTicketNumber',
+            parameters: {
+                ticketNumber: ticketNumber,
+            }
+        });
+    };
+    acknowledgeDictionary.room.makeHostTicketNumber = function (originalAction) {
+        var ticketNumber = originalAction.parameters.ticketNumber;
+        var message = 'Successfully made ticket number #' + ticketNumber + ' host';
+        console.log(message);
+    };
+    
     self.removeUser = function (user) {
         sendRemoveTicketNumber(user.ticketNumber, 'Removed by Host');
     };

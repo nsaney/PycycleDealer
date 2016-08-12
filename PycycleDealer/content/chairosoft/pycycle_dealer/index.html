@@ -112,13 +112,15 @@
                     <!-- Profile Information -->
                     <h4>My Info</h4>
                     <table class="table table-fit table-very-condensed">
+                        <thead>
+                            <tr class="info">
+                                <th>Ticket #</th>
+                                <th>Name</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             <tr>
-                                <td><label>Ticket #</label></td>
                                 <td data-bind="text: ticketNumber"></td>
-                            </tr>
-                            <tr>
-                                <td><label>Name</label></td>
                                 <td data-bind="text: userName"></td>
                             </tr>
                         </tbody>
@@ -126,9 +128,9 @@
                     <!-- Host Information -->
                     <div data-bind="if: isHost">
                         <h4>Active Users</h4>
-                        <table class="table table-fit">
-                            <thead class="thead-default">
-                                <tr>
+                        <table class="table table-fit table-hover">
+                            <thead>
+                                <tr class="success">
                                     <th>Ticket #</th>
                                     <th>Name</th>
                                     <th>Make Host</th>
@@ -145,9 +147,9 @@
                             </tbody>
                         </table>
                         <h4>Waiting Users</h4>
-                        <table class="table table-fit">
-                            <thead class="thead-default">
-                                <tr>
+                        <table class="table table-fit table-hover">
+                            <thead>
+                                <tr class="warning">
                                     <th>Ticket #</th>
                                     <th>Name</th>
                                     <th>Activate</th>

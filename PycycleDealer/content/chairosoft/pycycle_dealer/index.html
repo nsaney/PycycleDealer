@@ -11,7 +11,7 @@
     <!-- === Bootstrap === -->
     <link href="web_resources/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet"/>
     
-    <!-- === Custom === -->
+    <!-- === Custom Bootstrap Extensions === -->
     <style>
         .table-fit > thead > tr > th ,
         .table-fit > thead > tr > td ,
@@ -21,6 +21,7 @@
         .table-fit > tfoot > tr > td {
             white-space: nowrap;
         }
+        
         .table-fit > thead > tr > th:not(:last-child) ,
         .table-fit > thead > tr > td:not(:last-child) ,
         .table-fit > tbody > tr > th:not(:last-child) ,
@@ -36,30 +37,44 @@
         .table-very-condensed > tbody > tr > td ,
         .table-very-condensed > tfoot > tr > th ,
         .table-very-condensed > tfoot > tr > td {
-            padding: 0 4px;
+            padding-top: 0px;
+            padding-right: 4px;
+            padding-bottom: 1px;
+            padding-left: 4px;
             border: none;
         }
+        
+        form table > thead > tr > th.form-label ,
+        form table > thead > tr > td.form-label ,
+        form table > tbody > tr > th.form-label ,
+        form table > tbody > tr > td.form-label ,
+        form table > tfoot > tr > th.form-label ,
+        form table > tfoot > tr > td.form-label {
+            vertical-align: middle;
+        }
+        
+        .max-width-half-sm { max-width: 384px; }
     </style>
 </head>
 <body style="display: none" data-bind="visible: windowLoaded">
     
     <!-- ============================ Content ============================ -->
-    <div class="container-fluid" data-bind="ifnot: websocketReadyState">
+    <div class="container-fluid text-center" data-bind="ifnot: websocketReadyState">
         <h3>Pycycle Dealer Room</h3>
         
         <h4>Welcome!</h4>
-        <form data-bind="submit: formEnterRoom_onsubmit">
-            <table>
+        <form class="center-block max-width-half-sm" data-bind="submit: formEnterRoom_onsubmit">
+            <table class="table table-fit table-very-condensed">
                 <tr>
-                    <td><label for="inputUsername">Username</label></td>
-                    <td><input id="inputUsername" type="text" data-bind="value: userName"/></td>
+                    <td class="form-label"><label for="inputUsername">Username</label></td>
+                    <td><input id="inputUsername" type="text" class="form-control" data-bind="value: userName"/></td>
                 </tr>
                 <tr>
-                    <td><label for="inputPassword">Password</label></td>
-                    <td><input id="inputPassword" type="password"/></td>
+                    <td class="form-label"><label for="inputPassword">Password</label></td>
+                    <td><input id="inputPassword" type="password" class="form-control"/></td>
                 </tr>
                 <tr>
-                    <td colspan="2"><input type="submit" value="Enter Game Room"/></td>
+                    <td colspan="2"><button type="submit" class="form-control btn btn-primary">Enter Game Room</button></td>
                 </tr>
             </table>
         </form>

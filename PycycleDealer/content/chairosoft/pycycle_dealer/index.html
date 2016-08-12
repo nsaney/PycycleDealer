@@ -10,11 +10,29 @@
     <!-- ============================ Styles ============================ -->
     <!-- === Bootstrap === -->
     <link href="web_resources/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet"/>
+    
+    <!-- === Custom === -->
+    <style>
+        td.fit ,
+        th.fit {
+            white-space: nowrap;
+            width: 1%;
+        }
+        .table-very-condensed > thead > tr > th ,
+        .table-very-condensed > thead > tr > td ,
+        .table-very-condensed > tbody > tr > th ,
+        .table-very-condensed > tbody > tr > td ,
+        .table-very-condensed > tfoot > tr > th,
+        .table-very-condensed > tfoot > tr > td {
+            padding: 0 4px;
+            border: none;
+        }
+    </style>
 </head>
 <body style="display: none" data-bind="visible: windowLoaded">
     
     <!-- ============================ Content ============================ -->
-    <div class="container" data-bind="ifnot: websocketReadyState">
+    <div class="container-fluid" data-bind="ifnot: websocketReadyState">
         <h3>Pycycle Dealer Room</h3>
         
         <h4>Welcome!</h4>
@@ -35,15 +53,18 @@
         </form>
     </div>
     
-    <div class="container" data-bind="if: websocketReadyState() === WebSocket.CONNECTING">
+    <div class="container-fluid" data-bind="if: websocketReadyState() === WebSocket.CONNECTING">
         Connecting to server...
     </div>
     
-    <div class="container" data-bind="if: websocketReadyState() === WebSocket.OPEN">
+    <div class="container-fluid" data-bind="if: websocketReadyState() === WebSocket.OPEN">
         <!-- Tab nav -->
         <ul class="nav nav-tabs">
             <li class="nav active">
-                <a href="#profile" data-toggle="tab">Profile</a>
+                <a href="#profile" data-toggle="tab">
+                    <span data-bind="if: isHost">Host</span>
+                    <span data-bind="ifnot: isHost">Profile</span>
+                </a>
             </li>
             <li class="nav" data-bind="if: ticketNumber">
                 <a href="#chat" data-toggle="tab">Chat</a>
@@ -58,53 +79,55 @@
             <!-- Profile pane -->
             <div class="tab-pane fade in active" id="profile">
                 <div data-bind="ifnot: ticketNumber">
-                    Waiting to enter room...
+                    Waiting to be accepted into the room...
                 </div>
                 <div data-bind="if: ticketNumber">
                     <!-- Profile Information -->
                     <h4>My Info</h4>
-                    <table class="table">
-                        <tr>
-                            <td>Ticket Number</td>
-                            <td>Name</td>
-                        </tr>
-                        <tr>
-                            <td data-bind="text: ticketNumber"></td>
-                            <td data-bind="text: userName"></td>
-                        </tr>
+                    <table class="table table-very-condensed">
+                        <tbody>
+                            <tr>
+                                <td class="fit"><label>Ticket #</label></td>
+                                <td data-bind="text: ticketNumber"></td>
+                            </tr>
+                            <tr>
+                                <td class="fit"><label>Name</label></td>
+                                <td data-bind="text: userName"></td>
+                            </tr>
+                        </tbody>
                     </table>
                     <!-- Host Information -->
                     <div data-bind="if: isHost">
                         <h4>Active Users</h4>
-                        <table class="table">
-                            <thead>
+                        <table class="table table-hover">
+                            <thead class="thead-default">
                                 <tr>
-                                    <td>Ticket Number</td>
-                                    <td>User Name</td>
-                                    <td>Remove from Room</td>
+                                    <th class="fit">Ticket #</th>
+                                    <th class="fit">Name</th>
+                                    <th>Remove</th>
                                 </tr>
                             </thead>
                             <tbody data-bind="foreach: activeUsersList">
                                 <tr>
-                                    <td data-bind="text: ticketNumber"></td>
-                                    <td data-bind="text: name"></td>
+                                    <td class="fit" data-bind="text: ticketNumber"></td>
+                                    <td class="fit" data-bind="text: name"></td>
                                     <td><button data-bind="click: $parent.removeUser">Remove</button></td>
                                 </tr>
                             </tbody>
                         </table>
                         <h4>Waiting Users</h4>
-                        <table class="table">
-                            <thead>
+                        <table class="table table-hover">
+                            <thead class="thead-default">
                                 <tr>
-                                    <td>Ticket Number</td>
-                                    <td>User Name</td>
-                                    <td>Move to Active</td>
+                                    <th class="fit">Ticket #</th>
+                                    <th class="fit">Name</th>
+                                    <th>Activate</th>
                                 </tr>
                             </thead>
                             <tbody data-bind="foreach: waitingUsersList">
                                 <tr>
-                                    <td data-bind="text: ticketNumber"></td>
-                                    <td data-bind="text: name"></td>
+                                    <td class="fit" data-bind="text: ticketNumber"></td>
+                                    <td class="fit" data-bind="text: name"></td>
                                     <td><button data-bind="click: $parent.activateUser">Activate</button></td>
                                 </tr>
                             </tbody>
@@ -138,11 +161,11 @@
         </div>
     </div>
     
-    <div class="container" data-bind="if: websocketReadyState() === WebSocket.CLOSING">
+    <div class="container-fluid" data-bind="if: websocketReadyState() === WebSocket.CLOSING">
         Disconnecting from server...
     </div>
     
-    <div class="container" data-bind="if: websocketReadyState() === WebSocket.CLOSED">
+    <div class="container-fluid" data-bind="if: websocketReadyState() === WebSocket.CLOSED">
         <div data-bind="if: websocketErrorText">
             <h4>Error</h4>
             <span data-bind="text: websocketErrorText"></span>

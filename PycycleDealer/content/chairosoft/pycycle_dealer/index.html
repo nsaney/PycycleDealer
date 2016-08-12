@@ -59,7 +59,8 @@
 <body style="display: none" data-bind="visible: windowLoaded">
     
     <!-- ============================ Content ============================ -->
-    <div class="container-fluid text-center" data-bind="ifnot: websocketReadyState">
+    <!-- ko ifnot: websocketReadyState -->
+    <div class="container-fluid text-center">
         <h3>Pycycle Dealer Room</h3>
         
         <h4>Welcome!</h4>
@@ -79,12 +80,16 @@
             </table>
         </form>
     </div>
+    <!-- /ko -->
     
-    <div class="container-fluid" data-bind="if: websocketReadyState() === WebSocket.CONNECTING">
+    <!-- ko if: websocketReadyState() === WebSocket.CONNECTING -->
+    <div class="container-fluid">
         Connecting to server...
     </div>
+    <!-- /ko -->
     
-    <div class="container-fluid" data-bind="if: websocketReadyState() === WebSocket.OPEN">
+    <!-- ko if: websocketReadyState() === WebSocket.OPEN -->
+    <div class="container-fluid">
         <!-- Tab nav -->
         <ul class="nav nav-tabs">
             <li class="nav active">
@@ -191,12 +196,16 @@
             </div>
         </div>
     </div>
+    <!-- /ko -->
     
-    <div class="container-fluid" data-bind="if: websocketReadyState() === WebSocket.CLOSING">
+    <!-- ko if: websocketReadyState() === WebSocket.CLOSING -->
+    <div class="container-fluid">
         Disconnecting from server...
     </div>
+    <!-- /ko -->
     
-    <div class="container-fluid" data-bind="if: websocketReadyState() === WebSocket.CLOSED">
+    <!-- ko if: websocketReadyState() === WebSocket.CLOSED -->
+    <div class="container-fluid">
         <div data-bind="if: websocketErrorText">
             <h4>Error</h4>
             <span data-bind="text: websocketErrorText"></span>
@@ -206,6 +215,7 @@
             <span data-bind="text: websocketCloseText"></span>
         </div>
     </div>
+    <!-- /ko -->
     
     <!-- ============================ Scripts ============================ -->
     <!-- === Knockout === -->

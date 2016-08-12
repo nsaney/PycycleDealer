@@ -13,16 +13,28 @@
     
     <!-- === Custom === -->
     <style>
-        td.fit ,
-        th.fit {
+        .table-fit > thead > tr > th ,
+        .table-fit > thead > tr > td ,
+        .table-fit > tbody > tr > th ,
+        .table-fit > tbody > tr > td ,
+        .table-fit > tfoot > tr > th ,
+        .table-fit > tfoot > tr > td {
             white-space: nowrap;
+        }
+        .table-fit > thead > tr > th:not(:last-child) ,
+        .table-fit > thead > tr > td:not(:last-child) ,
+        .table-fit > tbody > tr > th:not(:last-child) ,
+        .table-fit > tbody > tr > td:not(:last-child) ,
+        .table-fit > tfoot > tr > th:not(:last-child) ,
+        .table-fit > tfoot > tr > td:not(:last-child) {
             width: 1%;
         }
+        
         .table-very-condensed > thead > tr > th ,
         .table-very-condensed > thead > tr > td ,
         .table-very-condensed > tbody > tr > th ,
         .table-very-condensed > tbody > tr > td ,
-        .table-very-condensed > tfoot > tr > th,
+        .table-very-condensed > tfoot > tr > th ,
         .table-very-condensed > tfoot > tr > td {
             padding: 0 4px;
             border: none;
@@ -84,14 +96,14 @@
                 <div data-bind="if: ticketNumber">
                     <!-- Profile Information -->
                     <h4>My Info</h4>
-                    <table class="table table-very-condensed">
+                    <table class="table table-fit table-very-condensed">
                         <tbody>
                             <tr>
-                                <td class="fit"><label>Ticket #</label></td>
+                                <td><label>Ticket #</label></td>
                                 <td data-bind="text: ticketNumber"></td>
                             </tr>
                             <tr>
-                                <td class="fit"><label>Name</label></td>
+                                <td><label>Name</label></td>
                                 <td data-bind="text: userName"></td>
                             </tr>
                         </tbody>
@@ -99,35 +111,35 @@
                     <!-- Host Information -->
                     <div data-bind="if: isHost">
                         <h4>Active Users</h4>
-                        <table class="table table-hover">
+                        <table class="table table-fit">
                             <thead class="thead-default">
                                 <tr>
-                                    <th class="fit">Ticket #</th>
-                                    <th class="fit">Name</th>
+                                    <th>Ticket #</th>
+                                    <th>Name</th>
                                     <th>Remove</th>
                                 </tr>
                             </thead>
                             <tbody data-bind="foreach: activeUsersList">
                                 <tr>
-                                    <td class="fit" data-bind="text: ticketNumber"></td>
-                                    <td class="fit" data-bind="text: name"></td>
+                                    <td data-bind="text: ticketNumber"></td>
+                                    <td data-bind="text: name"></td>
                                     <td><button data-bind="click: $parent.removeUser">Remove</button></td>
                                 </tr>
                             </tbody>
                         </table>
                         <h4>Waiting Users</h4>
-                        <table class="table table-hover">
+                        <table class="table table-fit">
                             <thead class="thead-default">
                                 <tr>
-                                    <th class="fit">Ticket #</th>
-                                    <th class="fit">Name</th>
+                                    <th>Ticket #</th>
+                                    <th>Name</th>
                                     <th>Activate</th>
                                 </tr>
                             </thead>
                             <tbody data-bind="foreach: waitingUsersList">
                                 <tr>
-                                    <td class="fit" data-bind="text: ticketNumber"></td>
-                                    <td class="fit" data-bind="text: name"></td>
+                                    <td data-bind="text: ticketNumber"></td>
+                                    <td data-bind="text: name"></td>
                                     <td><button data-bind="click: $parent.activateUser">Activate</button></td>
                                 </tr>
                             </tbody>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="full-height">
 <head>
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>Pycycle Dealer Room</title>
     
@@ -13,6 +13,7 @@
     
     <!-- === Custom Bootstrap Extensions === -->
     <style>
+        
         .table-fit > thead > tr > th ,
         .table-fit > thead > tr > td ,
         .table-fit > tbody > tr > th ,
@@ -53,10 +54,94 @@
             vertical-align: middle;
         }
         
-        .max-width-half-sm { max-width: 384px; }
+        .hspace-5 { width: 5px; }
+        .hspace-15 { width: 15px; }
+        .hspace-30 { width: 30px; }
+        .hspace-60 { width: 60px; }
+        
+        .max-width-50-sm { max-width: 325px; }
+        .max-width-50-md { max-width: 485px; }
+        .max-width-50-lg { max-width: 585px; }
+        .max-width-75-lg { max-width: 877.5px; }
+        
+        .max-height-50 { max-height: 50px !important; }
+        
+        .full-height,
+        .flex-column {
+            position: relative;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            height: 100% !important;
+        }
+        
+        .flex-column {
+            display: flex;
+            flex-direction: column
+        }
+        
+        .flex-row,
+        .flex-row-reverse {
+            position: relative;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            width: 100% !important;
+        }
+        
+        .flex-row {
+            display: flex;
+            flex-direction: row;
+        }
+        
+        .flex-row-reverse {
+            display: flex;
+            flex-direction: row-reverse;
+        }
+        
+        .flex-none { flex: none; }        
+        .flex-1 { flex: 1 1; }
+        .flex-2 { flex: 2 2; }
+        
+        .overflow-hidden { overflow: hidden; }
+        .scroll-y { overflow-y: scroll; }
+        
+        .chat-entries {
+            border: 1px solid #ddd;
+        }
+        
+        .chat-entries .chat-details {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+        
+        .chat-entries .chat-message {
+            margin-bottom: 10px;
+        }
+        
+        .chat-entries .chat-message .panel-heading {
+            border-radius: 15px;
+        }
+        
+        .chat-entries .chat-message.is-me .panel-heading {
+            border-bottom-right-radius: 0;
+        }
+        
+        .chat-entries .chat-message.is-not-me .panel-heading {
+            border-bottom-left-radius: 0;
+        }
+        
+        .chat-submit .form-group {
+            margin: 0;
+            background-color: #ddd;
+            padding: 10px 1px;
+        }
+        
     </style>
 </head>
-<body style="display: none" data-bind="visible: windowLoaded">
+<body class="full-height" style="display: none" data-bind="visible: windowLoaded">
     
     <!-- ============================ Content ============================ -->
     <!-- ko ifnot: websocketReadyState -->
@@ -64,7 +149,7 @@
         <h3>Pycycle Dealer Room</h3>
         
         <h4>Welcome!</h4>
-        <form class="center-block max-width-half-sm" data-bind="submit: formEnterRoom_onsubmit">
+        <form class="center-block max-width-50-sm" data-bind="submit: formEnterRoom_onsubmit">
             <table class="table table-fit table-very-condensed">
                 <tr>
                     <td class="form-label"><label for="inputUsername">Username</label></td>
@@ -89,9 +174,9 @@
     <!-- /ko -->
     
     <!-- ko if: websocketReadyState() === WebSocket.OPEN -->
-    <div class="container-fluid">
+    <div class="container-fluid flex-column">
         <!-- Tab nav -->
-        <ul class="nav nav-tabs">
+        <ul class="nav nav-tabs flex-none">
             <li class="nav active">
                 <a href="#profile" data-toggle="tab">
                     <span data-bind="if: isHost">Host</span>
@@ -107,9 +192,9 @@
         </ul>
 
         <!-- Tab panes -->
-        <div class="tab-content">
+        <div class="tab-content flex-1 scroll-y">
             <!-- Profile pane -->
-            <div class="tab-pane fade in active" id="profile">
+            <div id="profile" class="tab-pane fade in active">
                 <div data-bind="ifnot: ticketNumber">
                     Waiting to be accepted into the room...
                 </div>
@@ -172,26 +257,46 @@
                 </div>
             </div>
             <!-- Chat pane -->
-            <div class="tab-pane fade" id="chat" data-bind="if: ticketNumber">
-                <h4>Message (Send)</h4>
-                <form data-bind="submit: formChat_onsubmit">
-                    <input type="text" data-bind="value: chatWorkingMessage"/>
-                    <input type="submit" value="Send"/>
-                </form>
-              
-                <h4>Message (Received)</h4>
-                <table class="table">
-                    <tbody data-bind="foreach: chatEntries">
-                        <tr>
-                            <td data-bind="chatDateFromTimeMs: serverEpochTimestampMs"></td>
-                            <td data-bind="text: userName"></td>
-                            <td data-bind="text: message"></td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div id="chat" class="tab-pane fade full-height" data-bind="if: ticketNumber">
+                <div class="flex-column center-block max-width-75-lg">
+                    <!-- Chat entries -->
+                    <div id="divChatEntries" class="chat-entries flex-1 scroll-y" data-bind="foreach: chatEntries, event: { 'scroll': divChatEntries_onscroll }, css: { 'chat-scrolled': chatIsScrolled }">
+                        <table class="table table-fit chat-details">
+                            <tr>
+                                <td data-bind="if: !user.isMe">
+                                    <strong data-bind="text: user.name"></strong>
+                                </td>
+                                <td class="text-right" data-bind="chatDateFromTimeMs: serverEpochTimestampMs">
+                                </td>
+                            </tr>
+                        </table>
+                        <div class="chat-message" data-bind="css: { 'flex-row panel-primary is-me': user.isMe, 'flex-row-reverse panel-info is-not-me': !user.isMe }">
+                            <div class="flex-none hspace-30">
+                            </div>
+                            <div class="flex-1 panel-heading">
+                                <span data-bind="text: message"></span>
+                            </div>
+                            <div class="flex-none hspace-5">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Chat submit -->
+                    <div class="chat-submit flex-none">
+                        <form data-bind="submit: formChat_onsubmit">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" data-bind="value: chatWorkingMessage"/>
+                                    <span class="input-group-btn">
+                                        <button type="submit" class="btn btn-primary">Send</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
             <!-- Game pane -->
-            <div class="tab-pane fade" id="game" data-bind="if: game">
+            <div id="game" class="tab-pane fade" data-bind="if: game">
                 TODO: Content inside tab Game
             </div>
         </div>

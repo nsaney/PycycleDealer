@@ -733,7 +733,7 @@ class Room:
                 method = "chat",
                 parameters = {
                     "serverEpochTimestampMs": _Date().getTime(),
-                    "userName": user.name,
+                    "user": user.asDictionary(),
                     "message": message
                 }
             )

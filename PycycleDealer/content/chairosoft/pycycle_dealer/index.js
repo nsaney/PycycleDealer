@@ -38,6 +38,7 @@ ko.applyBindings(new (function IndexViewModel() {
     self.activeUsersList = ko.observableArray([]);
     self.chatWorkingMessage = ko.observable('');
     self.chatEntries = ko.observableArray([]);
+    self.chatIsScrolled = ko.observable(false);
     self.game = ko.observable();
     
     
@@ -164,7 +165,19 @@ ko.applyBindings(new (function IndexViewModel() {
     };
     
     function room_chat(updateParameters) {
+        updateParameters.user.isMe = (updateParameters.user.ticketNumber === self.ticketNumber());
+        var startedScrolled = self.chatIsScrolled();
         self.chatEntries.push(updateParameters);
+        if (!startedScrolled) {
+            var $divChatEntries = $('#divChatEntries');
+            $divChatEntries.animate({ scrollTop: $divChatEntries[0].scrollHeight }, 500);
+        }
+    };
+    self.divChatEntries_onscroll = function (data, event) {
+        // see: https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight#Determine_if_an_element_has_been_totally_scrolled
+        var element = event.target;
+        var isScrolled = (element.scrollHeight - element.scrollTop !== element.clientHeight);
+        self.chatIsScrolled(isScrolled);
     };
     
     var updateDictionary = {

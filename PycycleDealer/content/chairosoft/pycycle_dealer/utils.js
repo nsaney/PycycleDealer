@@ -79,13 +79,13 @@
             var year = dateValue.getFullYear();
             var month = dateValue.getMonth() + 1;
             var day = dateValue.getDate();
-            var datePart = [year, month, day].map(str => utils.padLeft(str, '0', 2)).join('-');
+            var datePart = [year, month, day].map(function (str) { return utils.padLeft(str, '0', 2) }).join('-');
             
             // time part
             var hour = dateValue.getHours();
             var minute = dateValue.getMinutes();
             var second = dateValue.getSeconds();
-            var timePart = [hour, minute, second].map(str => utils.padLeft(str, '0', 2)).join(':');
+            var timePart = [hour, minute, second].map(function (str) { return utils.padLeft(str, '0', 2) }).join(':');
             
             // full text
             var dateText = datePart + ' ' + timePart;

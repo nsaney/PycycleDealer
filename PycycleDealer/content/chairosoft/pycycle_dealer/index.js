@@ -37,9 +37,43 @@ ko.applyBindings(new (function IndexViewModel() {
     self.waitingUsersList = ko.observableArray([]);
     self.activeUsersList = ko.observableArray([]);
     self.chatWorkingMessage = ko.observable('');
-    self.chatEntries = ko.observableArray([]);
+    self.chatEntries = ko.observableArray([
+    /*
+        {
+            serverEpochTimestampMs: Date.now(),
+            user: { name: 'Test 1', ticketNumber: 1 },
+            message: 'Test 1 message'
+        },
+        {
+            serverEpochTimestampMs: Date.now(),
+            user: { name: 'Test 2', ticketNumber: 2, isMe: true },
+            message: 'Test 2 message'
+        },
+        {
+            serverEpochTimestampMs: Date.now(),
+            user: { name: 'Test 3', ticketNumber: 3 },
+            message: 'Test 3 message'
+        },
+    */
+    ]);
     self.chatIsScrolled = ko.observable(false);
     self.game = ko.observable();
+    self.chatEntriesComputedFlexStyles = ko.computed(function () {
+        if (!windowLoaded()) { return []; }
+        var regex = /(flex|overflow)/;
+        var divChatEntries = document.getElementById('divChatEntries');
+        if (!divChatEntries) { return []; }
+        var divChatEntriesStyles = window.getComputedStyle(divChatEntries, null);
+        var result = [];
+        for (var i = 0; i < divChatEntriesStyles.length; ++i) {
+            var name = divChatEntriesStyles[i];
+            var value = divChatEntriesStyles.getPropertyValue(name);
+            if (regex.test(name) || regex.test(value)) {
+                result.push({ name: name, value: value });
+            }
+        }
+        return result;
+    });
     
     
     // Web Socket Handler

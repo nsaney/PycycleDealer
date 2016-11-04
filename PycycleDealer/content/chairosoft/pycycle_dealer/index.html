@@ -76,9 +76,15 @@
             height: 100% !important;
         }
         
+        /*
+        .tab-content { border: 2px solid lime; position: relative; }
+        #profile { border: 2px solid magenta; }
+        #chat { border: 2px solid red; height: 100% !important; }
+        */
+        
         .flex-column {
             display: flex;
-            flex-direction: column
+            flex-direction: column;
         }
         
         .flex-row,
@@ -103,7 +109,6 @@
         
         .flex-none { flex: none; }        
         .flex-1 { flex: 1 1; }
-        .flex-2 { flex: 2 2; }
         
         .overflow-hidden { overflow: hidden; }
         .scroll-y { overflow-y: scroll; }
@@ -257,7 +262,7 @@
                 </div>
             </div>
             <!-- Chat pane -->
-            <div id="chat" class="tab-pane fade full-height" data-bind="if: ticketNumber">
+            <div id="chat" class="tab-pane fade in full-height" data-bind="if: ticketNumber">
                 <div class="flex-column center-block max-width-75-lg">
                     <!-- Chat entries -->
                     <div id="divChatEntries" class="chat-entries flex-1 scroll-y" data-bind="foreach: chatEntries, event: { 'scroll': divChatEntries_onscroll }, css: { 'chat-scrolled': chatIsScrolled }">
@@ -292,11 +297,19 @@
                                 </div>
                             </div>
                         </form>
+                        <!-- 
+                        <div data-bind="foreach: chatEntriesComputedFlexStyles">
+                            [
+                            <span data-bind="text: name"></span>:
+                            <span data-bind="text: value"></span>
+                            ]
+                        </div> 
+                        -->
                     </div>
                 </div>
             </div>
             <!-- Game pane -->
-            <div id="game" class="tab-pane fade" data-bind="if: game">
+            <div id="game" class="tab-pane fade in" data-bind="if: game">
                 TODO: Content inside tab Game
             </div>
         </div>
